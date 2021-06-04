@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const hostname = 'localhost';
 const port = 8000;
+const appUrl = 'http://localhost:3000';
 
 let precipitation;
 let temperature;
@@ -21,6 +22,7 @@ fs.readFile('./server/data/temperature.json', (err, data) => {
 
 const requestListener = (req, res) => {
     res.statusCode = 200;
+    res.setHeader('Access-Control-Allow-Origin', appUrl);
     res.setHeader('Content-Type', 'application/json');
 
     switch (req.url) {
