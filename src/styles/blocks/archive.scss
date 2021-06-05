@@ -1,0 +1,23 @@
+.archive {
+    padding-top: 30px;
+
+    &__title {
+        font-size: 26px;
+        margin-right: 20px;
+    }
+
+    &__info {
+        display: flex;
+        width: 100%;
+        height: 600px;
+    }
+
+    &__type {
+        width: 10%;
+        margin-right: 2%;
+    }
+
+    &__visualization {
+        width: 88%;
+    }
+}
