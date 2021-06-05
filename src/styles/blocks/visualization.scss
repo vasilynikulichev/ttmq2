@@ -1,9 +1,15 @@
 .visualization {
-    &__date {
+    display: flex;
+    flex-direction: column;
 
+    &__date {
+        width: 100%;
+        height: 10%;
+        margin-bottom: 2%;
     }
 
     &__chart {
-
+        width: 100%;
+        height: 88%;
     }
 }

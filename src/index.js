@@ -8,27 +8,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const getData = async () => {
         const {data} = await api.getTemperature();
 
-        console.log(data);
+        let openRequest = indexedDB.open('app');
 
-        let openRequest = indexedDB.open('app', 1);
-
-        openRequest.onupgradeneeded = function() {
+        openRequest.onupgradeneeded = (event) => {
             let db = openRequest.result;
+
+            if (!db.objectStoreNames.contains('precipitation')) {
+                db.createObjectStore('precipitation', {keyPath: 't'});
+            }
 
             if (!db.objectStoreNames.contains('temperature')) {
                 db.createObjectStore('temperature', {keyPath: 't'});
             }
         };
 
-        openRequest.onerror = function() {
+        openRequest.onerror = () => {
             console.error("Error", openRequest.error);
         };
 
-        openRequest.onsuccess = async () => {
+        openRequest.onsuccess = () => {
             let db = openRequest.result;
 
-            let transaction = db.transaction('temperature', 'readwrite');
-            let precipitationStore = transaction.objectStore('temperature');
+            let transaction = db.transaction('precipitation', 'readwrite');
+            let precipitationStore = transaction.objectStore('precipitation');
 
             let month = data[0].t.split('-')[1];
             let year = data[0].t.split('-')[0];
