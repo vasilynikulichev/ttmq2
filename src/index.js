@@ -30,9 +30,30 @@ document.addEventListener('DOMContentLoaded', () => {
             let transaction = db.transaction('precipitation', 'readwrite');
             let precipitationStore = transaction.objectStore('precipitation');
 
-            for (let i = 0; i < data.length; i++) {
-                precipitationStore.add(data[i]);
-            }
+            let month = data[0].t.split('-')[1];
+            let year = data[0].t.split('-')[0];
+            let sumTemperatureForMonth = null;
+            let dayInMonth = 0;
+
+            data.forEach((day) => {
+                let currentDate = day.t.split('-');
+                let currentYear = currentDate[0];
+                let currentMonth = currentDate[1];
+
+                if (month !== currentMonth) {
+                    precipitationStore.add({
+                        t: `${year}-${month}`,
+                        v: parseInt((sumTemperatureForMonth / dayInMonth) * 100) / 100,
+                    });
+                    month = currentMonth;
+                    year = currentYear;
+                    sumTemperatureForMonth = null;
+                    dayInMonth = 0;
+                }
+
+                sumTemperatureForMonth += day.v;
+                dayInMonth++;
+            });
         };
     }
 
