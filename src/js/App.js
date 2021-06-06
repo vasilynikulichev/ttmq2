@@ -7,6 +7,8 @@ export default class App {
     DB;
     yearMin;
     yearMax;
+    selectedMinYear;
+    selectedMaxYear;
 
     constructor(rootNode) {
         this.rootNode = rootNode;
@@ -85,6 +87,8 @@ export default class App {
         let {year: yearMax} = parseDate(data[data.length - 1].t);
         this.yearMin = yearMin;
         this.yearMax = yearMax;
+        this.selectedMinYear = yearMin;
+        this.selectedMaxYear = yearMax;
     }
 
     getTemplate() {
@@ -148,13 +152,22 @@ export default class App {
         new Select(selectNode, {value});
 
         selectNode.addEventListener('select', ({target, detail}) => {
-            const id = target.attributes.id.nodeValue;
-            const isDateFrom = id === 'date-from';
-            const select = document.getElementById(isDateFrom ? 'date-to' : 'date-from');
-            const selectList = select.querySelector('.select__list');
-            const {from, to} = isDateFrom ? {from: detail, to: this.yearMax} : {from: this.yearMin, to: detail};
+            const targetId = target.attributes.id.nodeValue;
+            const isDateFrom = targetId === 'date-from';
+            let oppositeId;
 
-            selectList.innerHTML = this.getSelectOptions(from, to);
+            if (isDateFrom) {
+                oppositeId = 'date-to';
+                this.selectedMinYear = detail;
+            } else {
+                oppositeId = 'date-from';
+                this.selectedMaxYear = detail;
+            }
+
+            const select = document.getElementById(oppositeId);
+            const selectList = select.querySelector('.select__list');
+
+            selectList.innerHTML = this.getSelectOptions(this.selectedMinYear, this.selectedMaxYear);
         });
     }
 }
