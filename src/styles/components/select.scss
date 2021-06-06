@@ -2,7 +2,7 @@
     &.open {
         .select__list {
             display: block;
-            height: 200px;
+            max-height: 200px;
             overflow: scroll;
         }
 
@@ -11,13 +11,6 @@
             border-radius: 5px 5px 0 0;
         }
     }
-
-    //&:hover {
-    //    .select__title,
-    //    .select__list {
-    //        background-color: #1489dc;
-    //    }
-    //}
 
     &__title {
         position: relative;

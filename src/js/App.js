@@ -146,5 +146,15 @@ export default class App {
         const selectNode = document.getElementById(selectId);
 
         new Select(selectNode, {value});
+
+        selectNode.addEventListener('select', ({target, detail}) => {
+            const id = target.attributes.id.nodeValue;
+            const isDateFrom = id === 'date-from';
+            const select = document.getElementById(isDateFrom ? 'date-to' : 'date-from');
+            const selectList = select.querySelector('.select__list');
+            const {from, to} = isDateFrom ? {from: detail, to: this.yearMax} : {from: this.yearMin, to: detail};
+
+            selectList.innerHTML = this.getSelectOptions(from, to);
+        });
     }
 }
