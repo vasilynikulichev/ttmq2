@@ -9,6 +9,7 @@ export default class App {
     yearMax;
     selectedMinYear;
     selectedMaxYear;
+    selectedType = 'temperature';
 
     constructor(rootNode) {
         this.rootNode = rootNode;
@@ -18,7 +19,7 @@ export default class App {
 
     async init() {
         await this.connectDB();
-        const data = await this.getData('temperature');
+        const data = await this.getData(this.selectedType);
         await this.getMinAndMaxYear(data);
         this.render();
     }
@@ -97,7 +98,7 @@ export default class App {
                 <div class="archive">
                     <h1 class="archive__title">Архив метеослужбы</h1>
                     <div class="archive__info">
-                        <div class="archive__type type">
+                        <div class="archive__type type" id="type">
                             <label class="type__item">
                                 <input type="radio" name="type" value="temperature" checked>
                                 <span>Температура</span>
@@ -144,6 +145,7 @@ export default class App {
         this.rootNode.insertAdjacentHTML('beforeend', this.getTemplate());
         this.addSelectEvent('date-from', this.yearMin);
         this.addSelectEvent('date-to', this.yearMax);
+        this.addTypeEvent();
     }
 
     addSelectEvent(selectId, value) {
@@ -168,6 +170,14 @@ export default class App {
             const selectList = select.querySelector('.select__list');
 
             selectList.innerHTML = this.getSelectOptions(this.selectedMinYear, this.selectedMaxYear);
+        });
+    }
+
+    addTypeEvent() {
+        const typeNode = document.getElementById('type');
+
+        typeNode.addEventListener('click', (event) => {
+            this.selectedType = event.target.value;
         });
     }
 }
