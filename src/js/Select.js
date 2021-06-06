@@ -10,8 +10,8 @@ export default class Select {
 
     init() {
         if (this.detail && Object.keys(this.detail).length) {
-            const {title, value} = this.detail;
-            this.setValue(title, value);
+            const {value} = this.detail;
+            this.setValue(value);
         }
 
         this.selectNode.addEventListener('click', ({target}) => {
@@ -46,15 +46,12 @@ export default class Select {
         !this.selectNode.contains(event.target) ? this.close() : '';
     }
 
-    setValue(title, value) {
-        this.selectNode.querySelector('.select__title').innerHTML = title;
+    setValue(value) {
+        this.selectNode.querySelector('.select__title').innerHTML = value;
 
         const customEvent = new CustomEvent('select', {
             bubbles: true,
-            detail: {
-                title,
-                value
-            }
+            detail: value
         });
 
         this.selectNode.dispatchEvent(customEvent);

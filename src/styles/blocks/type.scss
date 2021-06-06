@@ -9,7 +9,7 @@
             display: none;
 
             &:checked + span {
-                background-color: #939393;
+                background-color: blue;
             }
         }
 
@@ -18,11 +18,12 @@
             font-size: 16px;
             display: block;
             padding: 10px 15px;
-            background-color: #b1b1b1;
+            background-color: #6d9ce3;
             cursor: pointer;
+            border-radius: 3px;
 
             &:hover {
-                background-color: #a2a2a2;
+                background-color: #1489dc;
             }
         }
     }

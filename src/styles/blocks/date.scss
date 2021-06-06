@@ -1,3 +1,7 @@
 .date {
+    display: flex;
 
+    &__item {
+        margin-right: 10px;
+    }
 }
