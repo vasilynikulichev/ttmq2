@@ -2,6 +2,7 @@ import api from '../api/Api';
 import DBInterface from '../helpers/DBInterface';
 import parseDate from '../helpers/parseDate';
 import Select from './Select';
+import chartInstance from './Chart';
 
 export default class App {
     DB;
@@ -10,6 +11,7 @@ export default class App {
     selectedMinYear;
     selectedMaxYear;
     selectedType = 'temperature';
+    data;
 
     constructor(rootNode) {
         this.rootNode = rootNode;
@@ -19,8 +21,8 @@ export default class App {
 
     async init() {
         await this.connectDB();
-        const data = await this.getData(this.selectedType);
-        await this.getMinAndMaxYear(data);
+        this.data = await this.getData(this.selectedType);
+        await this.calcMinAndMaxYear(this.data);
         this.render();
     }
 
@@ -50,24 +52,27 @@ export default class App {
 
         let {year, month} = parseDate(data[0].t);
         let sumTemperatureForMonth = null;
-        let dayInMonth = 0;
+        let days = [];
 
         data.forEach((day) => {
             let {year: currentYear, month: currentMonth} = parseDate(day.t);
 
             if (month !== currentMonth) {
                 store.add({
-                    t: `${year}-${month}`,
-                    v: parseInt((sumTemperatureForMonth / dayInMonth) * 100) / 100,
+                    time: `${year}-${month}`,
+                    avg: parseInt((sumTemperatureForMonth / days.length) * 100) / 100,
+                    max: Math.max(...days),
+                    min: Math.min(...days),
+                    days,
                 });
                 month = currentMonth;
                 year = currentYear;
                 sumTemperatureForMonth = null;
-                dayInMonth = 0;
+                days = []
             }
 
             sumTemperatureForMonth += day.v;
-            dayInMonth++;
+            days.push(day.v);
         });
 
         return await this.getData(storeName, range);
@@ -83,7 +88,7 @@ export default class App {
         }
     }
 
-    getMinAndMaxYear(data) {
+    calcMinAndMaxYear(data) {
         let {year: yearMin} = parseDate(data[0].t);
         let {year: yearMax} = parseDate(data[data.length - 1].t);
         this.yearMin = yearMin;
@@ -146,6 +151,7 @@ export default class App {
         this.addSelectEvent('date-from', this.yearMin);
         this.addSelectEvent('date-to', this.yearMax);
         this.addTypeEvent();
+        chartInstance.init('chart', this.data);
     }
 
     addSelectEvent(selectId, value) {
@@ -170,14 +176,26 @@ export default class App {
             const selectList = select.querySelector('.select__list');
 
             selectList.innerHTML = this.getSelectOptions(this.selectedMinYear, this.selectedMaxYear);
+
+            this.updateChart();
         });
     }
 
     addTypeEvent() {
         const typeNode = document.getElementById('type');
 
-        typeNode.addEventListener('click', (event) => {
-            this.selectedType = event.target.value;
+        typeNode.addEventListener('click', ({target}) => {
+            const {tagName, value} = target;
+
+            if (tagName.toLowerCase() === 'input') {
+                this.selectedType = value;
+                this.updateChart();
+            }
         });
+    }
+
+    async updateChart() {
+        this.data = await this.getData(this.selectedType, {from: `${this.selectedMinYear}-01`, to: `${this.selectedMaxYear}-12`});
+        chartInstance.updateData(this.data);
     }
 }
