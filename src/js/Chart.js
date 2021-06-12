@@ -15,9 +15,7 @@ class Chart {
 
     init(rootId, data) {
         this.rootNode = document.getElementById(rootId);
-        // console.log(data);
-        this.data = data;
-        this.dataLength = data.length;
+        this.processingData(data);
 
         this.getSize();
         this.createCanvasNode();
@@ -27,10 +25,14 @@ class Chart {
     }
 
     updateData(data) {
-        this.data = data;
-        this.dataLength = data.length;
+        this.processingData(data);
         this.clear();
         this.render();
+    }
+
+    processingData(data) {
+        this.data = data;
+        this.dataLength = data.length;
     }
 
     clear() {
