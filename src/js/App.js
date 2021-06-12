@@ -59,7 +59,7 @@ export default class App {
 
             if (month !== currentMonth) {
                 store.add({
-                    time: `${year}-${month}`,
+                    t: `${year}-${month}`,
                     avg: parseInt((sumTemperatureForMonth / days.length) * 100) / 100,
                     max: Math.max(...days),
                     min: Math.min(...days),

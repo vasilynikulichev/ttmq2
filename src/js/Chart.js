@@ -15,6 +15,7 @@ class Chart {
 
     init(rootId, data) {
         this.rootNode = document.getElementById(rootId);
+        // console.log(data);
         this.data = data;
         this.dataLength = data.length;
 
@@ -58,8 +59,7 @@ class Chart {
     }
 
     render() {
-        this.getMinY();
-        this.getMaxY();
+        this.getExtremeValues();
         this.renderLeftValues();
         // this.renderBottomValues();
         this.renderHorizontalLines();
@@ -75,16 +75,22 @@ class Chart {
         return this.height - (((this.height - this.paddingBottom - this.paddingTop) / (this.maxY - this.minY)) * (value - this.minY)) - this.paddingBottom;
     }
 
-    getMinY() {
-        // const minData = Math.min(...this.data);
-        // this.minY = minData - (10 + minData % 5);
-        this.minY = -50;
-    }
+    getExtremeValues() {
+        let min = 0;
+        let max = 0;
 
-    getMaxY() {
-        // const maxData = Math.max(...this.data);
-        // this.maxY = maxData + (10 - maxData % 10);
-        this.maxY = 40;
+        this.data.forEach((item) => {
+            if (item.max > max) {
+                max = item.max;
+            }
+
+            if (item.min < min) {
+                min = item.min;
+            }
+        });
+
+        this.minY = min - (10 + min % 5);
+        this.maxY = max + (10 - max % 10);
     }
 
     renderLeftValues() {
