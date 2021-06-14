@@ -65,8 +65,8 @@ class Chart {
         this.renderLeftValues();
         this.renderBottomValues();
         this.renderHorizontalLines();
+        this.renderVerticalLines();
         this.renderGraph();
-        // this.renderDots();
     }
 
     getXPixel(value) {
@@ -107,76 +107,92 @@ class Chart {
     }
 
     renderBottomValues() {
-        let step = (this.dataLength - 1) / 12;
         let i = 0;
+        let step = (this.dataLength - 1) / 12;
+        const yPixel = this.height - this.paddingBottom;
+
         this.ctx.fillStyle = 'black';
-        this.ctx.textAlign = 'center';
         this.ctx.font = this.ctx.font.replace(/\d+px/, '14px');
+        this.ctx.strokeStyle = '#85a3cc';
+        this.ctx.lineWidth = 2;
 
         // if (this.dataLength > 10) {
         //     step = Math.round(this.dataLength / 10);
         // }
 
-        while(i <= this.dataLength) {
+        while (i <= this.dataLength) {
             const roundIndex = Math.round(i);
+            const xPixel = this.getXPixel(i);
+            this.ctx.textAlign = 'center';
+
             if (roundIndex === 0) {
                 this.ctx.textAlign = 'start';
             }
-            console.log(i, roundIndex, this.dataLength);
+
             if (i + step > this.dataLength) {
                 this.ctx.textAlign = 'end';
             }
 
-            this.ctx.fillText(this.data[roundIndex].x, this.getXPixel(roundIndex), this.height - this.paddingBottom + 20);
+            this.ctx.fillText(this.data[roundIndex].x, xPixel, yPixel + 20);
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(xPixel, yPixel + 10);
+            this.ctx.lineTo(xPixel, yPixel);
+            this.ctx.stroke();
+
             i = i + step;
         }
-
-        // this.ctx.fillText(this.data[this.dataLength - 1].x, this.getXPixel(this.dataLength - 1), this.height - this.paddingBottom + 20);
     }
 
     renderHorizontalLines() {
+        const xPixel = this.getXPixel(0);
+
+        this.ctx.beginPath();
         this.ctx.strokeStyle = '#85a3cc';
         this.ctx.lineWidth = 2;
-        this.ctx.beginPath();
 
         for (let i = this.minY; i <= this.maxY; i += 10) {
-            this.ctx.moveTo(this.getXPixel(0), this.getYPixel(i));
-            this.ctx.lineTo(this.width - this.paddingRight, this.getYPixel(i));
+            const yPixel = this.getYPixel(i);
+
+            this.ctx.moveTo(xPixel, yPixel);
+            this.ctx.lineTo(this.width - this.paddingRight, yPixel);
         }
 
         this.ctx.stroke();
     }
 
-    renderGraph() {
-        const lineWidth = 2;
+    renderVerticalLines() {
+        const xLeftPixel = this.getXPixel(0);
+        const xRightPixel = this.width - this.paddingRight;
+        const yEndPixel = this.height - this.paddingBottom;
 
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = '#85a3cc';
+        this.ctx.lineWidth = 2;
+
+        this.ctx.moveTo(xLeftPixel, this.paddingTop);
+        this.ctx.lineTo(xLeftPixel, yEndPixel);
+
+        this.ctx.moveTo(xRightPixel, this.paddingTop);
+        this.ctx.lineTo(xRightPixel, yEndPixel);
+
+        this.ctx.stroke();
+    }
+
+    renderGraph() {
         this.ctx.strokeStyle = '#d0dff2';
-        this.ctx.lineWidth = lineWidth;
+        this.ctx.lineWidth = 2;
         this.ctx.beginPath();
         this.ctx.moveTo(this.getXPixel(0), this.getYPixel(this.data[0].y));
 
         for (let i = 1; i < this.dataLength; i ++) {
             const x = Math.floor(this.getXPixel(i));
             const y = this.getYPixel(this.data[i].y);
+
             this.ctx.lineTo(x, y);
         }
 
         this.ctx.stroke();
-    }
-
-    renderDots() {
-        for (let i = 0; i < this.dataLength; i ++) {
-            this.ctx.fillStyle = '#f7f9fc';
-            this.ctx.beginPath();
-            this.ctx.arc(this.getXPixel(i), this.getYPixel(this.data[i]), 5, 0, Math.PI * 2, true);
-            this.ctx.fill();
-
-            this.ctx.fillStyle = '#468efb';
-
-            this.ctx.beginPath();
-            this.ctx.arc(this.getXPixel(i), this.getYPixel(this.data[i]), 2, 0, Math.PI * 2, true);
-            this.ctx.fill();
-        }
     }
 }
 
