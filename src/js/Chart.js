@@ -108,7 +108,7 @@ class Chart {
 
     renderBottomValues() {
         let i = 0;
-        let step = (this.dataLength - 1) / 12;
+        let step = (this.dataLength - 1) / 11;
         const yPixel = this.height - this.paddingBottom;
 
         this.ctx.fillStyle = 'black';
@@ -116,13 +116,10 @@ class Chart {
         this.ctx.strokeStyle = '#85a3cc';
         this.ctx.lineWidth = 2;
 
-        // if (this.dataLength > 10) {
-        //     step = Math.round(this.dataLength / 10);
-        // }
-
         while (i <= this.dataLength) {
             const roundIndex = Math.round(i);
             const xPixel = this.getXPixel(i);
+
             this.ctx.textAlign = 'center';
 
             if (roundIndex === 0) {
@@ -180,8 +177,8 @@ class Chart {
     }
 
     renderGraph() {
-        this.ctx.strokeStyle = '#d0dff2';
-        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = '#2178e5';
+        this.ctx.lineWidth = 1;
         this.ctx.beginPath();
         this.ctx.moveTo(this.getXPixel(0), this.getYPixel(this.data[0].y));
 

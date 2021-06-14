@@ -98,6 +98,8 @@ export default class App {
     }
 
     getTemplate() {
+        const selectOptions = this.getSelectOptions(this.yearMin, this.yearMax);
+
         return (
             `<div class="container">
                 <div class="archive">
@@ -118,13 +120,13 @@ export default class App {
                                 <div class="date__item select" id="date-from">
                                     <button class="select__title">Выберите</button>
                                     <ul class="select__list">
-                                        ${this.getSelectOptions(this.yearMin, this.yearMax)}
+                                        ${selectOptions}
                                     </ul>
                                 </div>
                                 <div class="date__item select" id="date-to">
                                     <button class="select__title">Выберите</button>
                                     <ul class="select__list">
-                                        ${this.getSelectOptions(this.yearMin, this.yearMax)}
+                                        ${selectOptions}
                                     </ul>
                                 </div>
                             </div>
@@ -162,23 +164,24 @@ export default class App {
         selectNode.addEventListener('select', ({target, detail}) => {
             const targetId = target.attributes.id.nodeValue;
             const isDateFrom = targetId === 'date-from';
-            let oppositeId;
 
             if (isDateFrom) {
-                oppositeId = 'date-to';
                 this.selectedMinYear = detail;
+                this.setSelectLimit('date-to', this.selectedMinYear, this.yearMax);
             } else {
-                oppositeId = 'date-from';
                 this.selectedMaxYear = detail;
+                this.setSelectLimit('date-from', this.yearMin, this.selectedMaxYear);
             }
-
-            const select = document.getElementById(oppositeId);
-            const selectList = select.querySelector('.select__list');
-
-            selectList.innerHTML = this.getSelectOptions(this.selectedMinYear, this.selectedMaxYear);
 
             this.updateChart();
         });
+    }
+
+    setSelectLimit(id, min, max) {
+        const select = document.getElementById(id);
+        const selectList = select.querySelector('.select__list');
+
+        selectList.innerHTML = this.getSelectOptions(min, max);
     }
 
     addTypeEvent() {
@@ -203,7 +206,7 @@ export default class App {
         const yearRange = Math.round(data.length / 12);
         let newData = [];
 
-        if (yearRange > 10) {
+        if (yearRange > 30) {
             let {year} = parseDate(data[0].t);
             let min = data[0].min;
             let max = data[0].max;
@@ -232,6 +235,34 @@ export default class App {
                 if (item.min < min) {
                     min = item.min;
                 }
+            });
+        }
+
+        if (yearRange > 5 && yearRange <= 30) {
+            data.forEach((item) => {
+                let {year} = parseDate(item.t);
+
+                newData.push({
+                    x: year,
+                    y: Math.max(...item.days),
+                });
+                newData.push({
+                    x: year,
+                    y: Math.min(...item.days),
+                });
+            });
+        }
+
+        if (yearRange <= 5) {
+            data.forEach((item) => {
+                let {year, month} = parseDate(item.t);
+
+                item.days.forEach((day) => {
+                    newData.push({
+                        x: `${month}.${year}`,
+                        y: day,
+                    });
+                })
             });
         }
 
