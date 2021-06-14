@@ -114,7 +114,6 @@ class Chart {
         this.ctx.fillStyle = 'black';
         this.ctx.font = this.ctx.font.replace(/\d+px/, '14px');
         this.ctx.strokeStyle = '#85a3cc';
-        this.ctx.lineWidth = 2;
 
         while (i <= this.dataLength) {
             const roundIndex = Math.round(i);
@@ -146,7 +145,6 @@ class Chart {
 
         this.ctx.beginPath();
         this.ctx.strokeStyle = '#85a3cc';
-        this.ctx.lineWidth = 2;
 
         for (let i = this.minY; i <= this.maxY; i += 10) {
             const yPixel = this.getYPixel(i);
@@ -165,7 +163,6 @@ class Chart {
 
         this.ctx.beginPath();
         this.ctx.strokeStyle = '#85a3cc';
-        this.ctx.lineWidth = 2;
 
         this.ctx.moveTo(xLeftPixel, this.paddingTop);
         this.ctx.lineTo(xLeftPixel, yEndPixel);
@@ -178,7 +175,6 @@ class Chart {
 
     renderGraph() {
         this.ctx.strokeStyle = '#2178e5';
-        this.ctx.lineWidth = 1;
         this.ctx.beginPath();
         this.ctx.moveTo(this.getXPixel(0), this.getYPixel(this.data[0].y));
 
