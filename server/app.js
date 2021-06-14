@@ -11,13 +11,11 @@ let temperature;
 fs.readFile('./server/data/precipitation.json', (err, data) => {
     if (err) throw err;
     precipitation = data;
-    // console.log(data);
 });
 
 fs.readFile('./server/data/temperature.json', (err, data) => {
     if (err) throw err;
     temperature = data;
-    // console.log(data);
 });
 
 const requestListener = (req, res) => {

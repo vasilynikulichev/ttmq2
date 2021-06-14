@@ -54,10 +54,10 @@ export default class App {
         let sumTemperatureForMonth = null;
         let days = [];
 
-        data.forEach((day) => {
+        data.forEach((day, index) => {
             let {year: currentYear, month: currentMonth} = parseDate(day.t);
 
-            if (month !== currentMonth) {
+            if (month !== currentMonth || index === data.length - 1) {
                 store.add({
                     t: `${year}-${month}`,
                     avg: parseInt((sumTemperatureForMonth / days.length) * 100) / 100,
@@ -151,7 +151,7 @@ export default class App {
         this.addSelectEvent('date-from', this.yearMin);
         this.addSelectEvent('date-to', this.yearMax);
         this.addTypeEvent();
-        chartInstance.init('chart', this.data);
+        chartInstance.init('chart', this.preprocessingData(this.data));
     }
 
     addSelectEvent(selectId, value) {
@@ -196,6 +196,45 @@ export default class App {
 
     async updateChart() {
         this.data = await this.getData(this.selectedType, {from: `${this.selectedMinYear}-01`, to: `${this.selectedMaxYear}-12`});
-        chartInstance.updateData(this.data);
+        chartInstance.updateData(this.preprocessingData(this.data));
+    }
+
+    preprocessingData(data) {
+        const yearRange = Math.round(data.length / 12);
+        let newData = [];
+
+        if (yearRange > 10) {
+            let {year} = parseDate(data[0].t);
+            let min = data[0].min;
+            let max = data[0].max;
+
+            data.forEach((item, index) => {
+                let {year: currentYear} = parseDate(item.t);
+
+                if (year !== currentYear || index === data.length - 1) {
+                    newData.push({
+                        x: year,
+                        y: max,
+                    });
+                    newData.push({
+                        x: year,
+                        y: min,
+                    });
+                    min = item.min;
+                    max = item.max;
+                    year = currentYear;
+                }
+
+                if (item.max > max) {
+                    max = item.max;
+                }
+
+                if (item.min < min) {
+                    min = item.min;
+                }
+            });
+        }
+
+        return newData;
     }
 }

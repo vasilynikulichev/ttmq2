@@ -63,7 +63,7 @@ class Chart {
     render() {
         this.getExtremeValues();
         this.renderLeftValues();
-        // this.renderBottomValues();
+        this.renderBottomValues();
         this.renderHorizontalLines();
         this.renderGraph();
         // this.renderDots();
@@ -82,16 +82,16 @@ class Chart {
         let max = 0;
 
         this.data.forEach((item) => {
-            if (item.max > max) {
-                max = item.max;
+            if (item.y > max) {
+                max = item.y;
             }
 
-            if (item.min < min) {
-                min = item.min;
+            if (item.y < min) {
+                min = item.y;
             }
         });
 
-        this.minY = min - (10 + min % 5);
+        this.minY = min !== 0 ? min - (10 + min % 5) : 0;
         this.maxY = max + (10 - max % 10);
     }
 
@@ -107,12 +107,31 @@ class Chart {
     }
 
     renderBottomValues() {
+        let step = (this.dataLength - 1) / 12;
+        let i = 0;
         this.ctx.fillStyle = 'black';
+        this.ctx.textAlign = 'center';
         this.ctx.font = this.ctx.font.replace(/\d+px/, '14px');
 
-        for (let i = 0; i < this.dataLength; i ++) {
-            this.ctx.fillText(i + 1, this.getXPixel(i), this.height - this.paddingBottom + 20);
+        // if (this.dataLength > 10) {
+        //     step = Math.round(this.dataLength / 10);
+        // }
+
+        while(i <= this.dataLength) {
+            const roundIndex = Math.round(i);
+            if (roundIndex === 0) {
+                this.ctx.textAlign = 'start';
+            }
+            console.log(i, roundIndex, this.dataLength);
+            if (i + step > this.dataLength) {
+                this.ctx.textAlign = 'end';
+            }
+
+            this.ctx.fillText(this.data[roundIndex].x, this.getXPixel(roundIndex), this.height - this.paddingBottom + 20);
+            i = i + step;
         }
+
+        // this.ctx.fillText(this.data[this.dataLength - 1].x, this.getXPixel(this.dataLength - 1), this.height - this.paddingBottom + 20);
     }
 
     renderHorizontalLines() {
@@ -134,26 +153,12 @@ class Chart {
         this.ctx.strokeStyle = '#d0dff2';
         this.ctx.lineWidth = lineWidth;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.getXPixel(0), this.getYPixel(this.data[0].avg));
+        this.ctx.moveTo(this.getXPixel(0), this.getYPixel(this.data[0].y));
 
         for (let i = 1; i < this.dataLength; i ++) {
-            // const x1 = Math.floor(this.getXPixel(i - 1));
-            // const y1 = this.getYPixel(this.data[i - 1].v);
-            const x2 = Math.floor(this.getXPixel(i));
-            const y2 = this.getYPixel(this.data[i].avg);
-            // const k = 30;
-            // const minYPixel = this.getYPixel(this.minY);
-            // const secondArg = {x: x2, y: y2};
-
-            // if (this.data[i - 1].v > this.data[i].v) {
-            //     this.ctx.bezierCurveTo(x1 + k, y1, x2 - k, y2, x2, y2);
-            //     secondArg.k = k;
-            // } else if (this.data[i - 1].v < this.data[i].v) {
-            //     this.ctx.bezierCurveTo(x1 + k, y1, x2 - k, y2, x2, y2);
-            //     secondArg.k = k;
-            // } else {
-                this.ctx.lineTo(x2, y2);
-            // }
+            const x = Math.floor(this.getXPixel(i));
+            const y = this.getYPixel(this.data[i].y);
+            this.ctx.lineTo(x, y);
         }
 
         this.ctx.stroke();
