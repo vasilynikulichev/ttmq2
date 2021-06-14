@@ -3,6 +3,7 @@ import DBInterface from '../helpers/DBInterface';
 import parseDate from '../helpers/parseDate';
 import Select from './Select';
 import chartInstance from './Chart';
+import {monthNames} from '../constants';
 
 export default class App {
     DB;
@@ -51,7 +52,6 @@ export default class App {
         const store = DBInterface.getStore(this.DB, storeName);
 
         let {year, month} = parseDate(data[0].t);
-        let sumTemperatureForMonth = null;
         let days = [];
 
         data.forEach((day, index) => {
@@ -60,18 +60,15 @@ export default class App {
             if (month !== currentMonth || index === data.length - 1) {
                 store.add({
                     t: `${year}-${month}`,
-                    avg: parseInt((sumTemperatureForMonth / days.length) * 100) / 100,
                     max: Math.max(...days),
                     min: Math.min(...days),
                     days,
                 });
                 month = currentMonth;
                 year = currentYear;
-                sumTemperatureForMonth = null;
                 days = []
             }
 
-            sumTemperatureForMonth += day.v;
             days.push(day.v);
         });
 
@@ -256,10 +253,11 @@ export default class App {
         if (yearRange <= 5) {
             data.forEach((item) => {
                 let {year, month} = parseDate(item.t);
+                const monthIndex = parseInt(month) - 1;
 
                 item.days.forEach((day) => {
                     newData.push({
-                        x: `${month}.${year}`,
+                        x: `${monthNames[monthIndex]} ${year}`,
                         y: day,
                     });
                 })
