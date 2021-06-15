@@ -42,7 +42,7 @@ export default class App {
     }
 
     async getData(storeName, range = null) {
-        const result = await this.getDbData(storeName, range);
+        const result = this.getDbData(storeName, range);
 
         if (result.length) {
             return result;
@@ -72,16 +72,16 @@ export default class App {
             days.push(day.v);
         });
 
-        return await this.getData(storeName, range);
+        return this.getDbData(storeName, range);
     }
 
-    async getDbData(storeName, range = null) {
+    getDbData(storeName, range = null) {
         const store = DBInterface.getStore(this.DB, storeName);
 
         if (range) {
-            return await DBInterface.getRange(store, range)
+            return DBInterface.getRange(store, range)
         } else {
-            return await DBInterface.getAll(store);
+            return DBInterface.getAll(store);
         }
     }
 
@@ -92,65 +92,6 @@ export default class App {
         this.yearMax = yearMax;
         this.selectedMinYear = yearMin;
         this.selectedMaxYear = yearMax;
-    }
-
-    getTemplate() {
-        const selectOptions = this.getSelectOptions(this.yearMin, this.yearMax);
-
-        return (
-            `<div class="container">
-                <div class="archive">
-                    <h1 class="archive__title">Архив метеослужбы</h1>
-                    <div class="archive__info">
-                        <div class="archive__type type" id="type">
-                            <label class="type__item">
-                                <input type="radio" name="type" value="temperature" checked>
-                                <span>Температура</span>
-                            </label>
-                            <label class="type__item">
-                                <input type="radio" name="type" value="precipitation">
-                                <span>Осадки</span>
-                            </label>
-                        </div>
-                        <div class="archive__visualization visualization">
-                            <div class="visualization__date date">
-                                <div class="date__item select" id="date-from">
-                                    <button class="select__title">Выберите</button>
-                                    <ul class="select__list">
-                                        ${selectOptions}
-                                    </ul>
-                                </div>
-                                <div class="date__item select" id="date-to">
-                                    <button class="select__title">Выберите</button>
-                                    <ul class="select__list">
-                                        ${selectOptions}
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="visualization__chart chart" id="chart"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>`
-        );
-    }
-
-    getSelectOptions(from, to) {
-        let template = '';
-
-        for (let i = from; i <= to; i++) {
-            template += `<li class="select__option" data-value="${i}">${i}</li>`;
-        }
-
-        return template;
-    }
-
-    render () {
-        this.rootNode.insertAdjacentHTML('beforeend', this.getTemplate());
-        this.addSelectEvent('date-from', this.yearMin);
-        this.addSelectEvent('date-to', this.yearMax);
-        this.addTypeEvent();
-        chartInstance.init('chart', this.preprocessingData(this.data));
     }
 
     addSelectEvent(selectId, value) {
@@ -199,6 +140,7 @@ export default class App {
         chartInstance.updateData(this.preprocessingData(this.data));
     }
 
+    /** formatting data for chart format */
     preprocessingData(data) {
         const yearRange = Math.round(data.length / 12);
         let newData = [];
@@ -265,5 +207,64 @@ export default class App {
         }
 
         return newData;
+    }
+
+    getAppTemplate() {
+        const selectOptions = this.getSelectOptions(this.yearMin, this.yearMax);
+
+        return (
+            `<div class="container">
+                <div class="archive">
+                    <h1 class="archive__title">Архив метеослужбы</h1>
+                    <div class="archive__info">
+                        <div class="archive__type type" id="type">
+                            <label class="type__item">
+                                <input type="radio" name="type" value="temperature" checked>
+                                <span>Температура</span>
+                            </label>
+                            <label class="type__item">
+                                <input type="radio" name="type" value="precipitation">
+                                <span>Осадки</span>
+                            </label>
+                        </div>
+                        <div class="archive__visualization visualization">
+                            <div class="visualization__date date">
+                                <div class="date__item select" id="date-from">
+                                    <button class="select__title">Выберите</button>
+                                    <ul class="select__list">
+                                        ${selectOptions}
+                                    </ul>
+                                </div>
+                                <div class="date__item select" id="date-to">
+                                    <button class="select__title">Выберите</button>
+                                    <ul class="select__list">
+                                        ${selectOptions}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="visualization__chart chart" id="chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`
+        );
+    }
+
+    getSelectOptions(from, to) {
+        let template = '';
+
+        for (let i = from; i <= to; i++) {
+            template += `<li class="select__option" data-value="${i}">${i}</li>`;
+        }
+
+        return template;
+    }
+
+    render () {
+        this.rootNode.insertAdjacentHTML('beforeend', this.getAppTemplate());
+        this.addSelectEvent('date-from', this.yearMin);
+        this.addSelectEvent('date-to', this.yearMax);
+        this.addTypeEvent();
+        chartInstance.init('chart', this.preprocessingData(this.data));
     }
 }

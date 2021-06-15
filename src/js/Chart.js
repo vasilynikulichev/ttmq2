@@ -13,6 +13,12 @@ class Chart {
     rootNode;
     data;
 
+    /**
+     * chart
+     * @rootId string
+     * @data array [{x,y}, ...]
+     */
+
     init(rootId, data) {
         this.rootNode = document.getElementById(rootId);
         this.processingData(data);
@@ -60,15 +66,6 @@ class Chart {
         this.ctx = this.canvasNode.getContext('2d');
     }
 
-    render() {
-        this.getExtremeValues();
-        this.renderLeftValues();
-        this.renderBottomValues();
-        this.renderHorizontalLines();
-        this.renderVerticalLines();
-        this.renderGraph();
-    }
-
     getXPixel(value) {
         return ((this.width - (this.paddingLeft + this.paddingRight)) / (this.dataLength - 1)) * value + ((this.paddingLeft - this.paddingRight) * 1.5);
     }
@@ -108,7 +105,7 @@ class Chart {
 
     renderBottomValues() {
         let i = 0;
-        let step = (this.dataLength - 1) / 11;
+        let step = (this.dataLength - 1) / 11; // 11 equal parts + extreme point = 12 points in x
         const yPixel = this.height - this.paddingBottom;
 
         this.ctx.fillStyle = 'black';
@@ -186,6 +183,15 @@ class Chart {
         }
 
         this.ctx.stroke();
+    }
+
+    render() {
+        this.getExtremeValues();
+        this.renderLeftValues();
+        this.renderBottomValues();
+        this.renderHorizontalLines();
+        this.renderVerticalLines();
+        this.renderGraph();
     }
 }
 
